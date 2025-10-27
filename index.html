@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title data-i18n="page_title">Portfolio — SysAdmin & Cybersecurity</title>
+  <meta name="description" data-i18n="meta_description">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+
+  <!-- Optional: Highlight.js for nicer code highlighting inside the modal -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+</head>
+<body>
+  <header class="topbar" role="banner">
+    <div class="container topbar-inner">
+      <div class="brand" aria-hidden="true">
+        <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#6ee7b7"/><stop offset="1" stop-color="#60a5fa"/></linearGradient></defs>
+          <rect x="8" y="8" width="84" height="84" rx="14" fill="url(#g)"/>
+          <text x="50" y="62" font-family="JetBrains Mono, monospace" text-anchor="middle" font-size="36" fill="#021124">AM</text>
+        </svg>
+        <div class="brand-text">
+          <div class="name" data-i18n="name">Adrià Montero</div>
+          <div class="role" data-i18n="role">SysAdmin • Cybersecurity Specialist</div>
+        </div>
+      </div>
+
+      <nav class="nav" role="navigation" aria-label="Main">
+        <ul>
+          <li><a href="#about" data-i18n="nav_about">About</a></li>
+          <li><a href="#skills" data-i18n="nav_skills">Skills</a></li>
+          <li><a href="#projects" data-i18n="nav_projects">Projects</a></li>
+          <li><a href="#certs" data-i18n="nav_certs">Certifications</a></li>
+          <li><a href="#contact" data-i18n="nav_contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="actions">
+        <div class="lang-switch" role="region" aria-label="Language">
+          <button class="lang-btn" data-lang="ca">CAT</button>
+          <button class="lang-btn" data-lang="es">ES</button>
+          <button class="lang-btn active" data-lang="en">EN</button>
+        </div>
+        <button id="themeToggle" class="theme-toggle" aria-pressed="false" aria-label="Toggle theme">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section id="hero" class="hero">
+      <canvas id="particles" class="particles" aria-hidden="true"></canvas>
+      <div class="container hero-inner">
+        <div class="hero-left">
+          <h1 class="hero-title">
+            <span data-i18n="hero_title_line1">Adrià Montero</span>
+            <span class="accent" data-i18n="hero_title_line2">SysAdmin & Cybersecurity</span>
+          </h1>
+          <p class="hero-sub" data-i18n="hero_sub">I design secure infrastructures, harden systems and protect production with pragmatic automation and threat knowledge.</p>
+          <div class="hero-ctas">
+            <!-- Enlace directo al PDF (ver en nueva pestaña) -->
+            <a class="btn filled" href="assets/resume/cv-adria-montero.pdf" target="_blank" rel="noopener" data-i18n="download_resume">Ver CV</a>
+
+            <a class="btn ghost" href="#projects" data-i18n="see_projects">See Projects</a>
+          </div>
+          <ul class="quick-stats" aria-hidden="true">
+            <li><strong>1</strong><span data-i18n="stat_years">Years</span></li>
+            <li><strong>—</strong><span data-i18n="stat_hosts">Hosts Secured</span></li>
+            <li><strong>3</strong><span data-i18n="stat_certs">Certs</span></li>
+          </ul>
+        </div>
+
+        <div class="hero-right" aria-hidden="true">
+          <div class="terminal-mockup">
+            <div class="term-header">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+              <div class="term-title">secure@infra:~</div>
+            </div>
+            <div class="term-body">
+              <pre>
+$ ./start-homelab.sh
+✔ Docker lab up
+✔ Simulated incidents for DFIR practice
+$ ./run-scan --quick
+✔ Findings exported to ./reports
+              </pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section about">
+      <div class="container">
+        <h2 data-i18n="about_title">About me</h2>
+        <p class="lead" data-i18n="about_lead">I’m a junior Systems Administrator finishing a higher technical degree (ASIX). I build practical skills through personal projects, homelab environments and CTFs — focused on Linux administration, automation and applied security. I enjoy turning manual tasks into repeatable, auditable code and learning by doing.</p>
+        <div class="about-grid">
+          <div class="card">
+            <h3 data-i18n="about_ops_title">Operations & Automation</h3>
+            <p data-i18n="about_ops">Day-to-day I work with Linux servers, containers and configuration-as-code tools. I automate deployments and repetitive tasks using Bash, Python and Ansible; I design simple CI/CD flows and write runbooks to make operations predictable and safe.</p>
+          </div>
+          <div class="card">
+            <h3 data-i18n="about_cyber_title">Security & Response</h3>
+            <p data-i18n="about_cyber">I practice incident triage, log collection and threat hunting in my lab. I harden systems with secure sysctl, firewall rules and monitoring hooks; I build small DFIR helpers and learn offensive techniques through structured labs to better defend infrastructure.</p>
+          </div>
+          <div class="card">
+            <h3 data-i18n="about_learn_title">Continuous Learning</h3>
+            <p data-i18n="about_learn">I’m finishing ASIX and actively studying certifications and hands-on paths (CTFs, TryHackMe / HackTheBox). I value documentation, tests and small automations that reduce human error. I’m eager to join a team as a junior SysAdmin / SecOps to apply and grow these skills.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="skills" class="section skills">
+      <div class="container">
+        <h2 data-i18n="skills_title">Skills</h2>
+        <div class="skills-grid">
+          <div class="skill">
+            <div class="skill-head"><h4 data-i18n="skill_linux">Linux & Servers</h4><span class="percent">85%</span></div>
+            <div class="bar"><div class="bar-fill" data-fill="85"></div></div>
+          </div>
+          <div class="skill">
+            <div class="skill-head"><h4 data-i18n="skill_security">Security Ops</h4><span class="percent">75%</span></div>
+            <div class="bar"><div class="bar-fill" data-fill="75"></div></div>
+          </div>
+          <div class="skill">
+            <div class="skill-head"><h4 data-i18n="skill_networks">Networking & Firewalls</h4><span class="percent">70%</span></div>
+            <div class="bar"><div class="bar-fill" data-fill="70"></div></div>
+          </div>
+          <div class="skill">
+            <div class="skill-head"><h4 data-i18n="skill_automation">Automation (Ansible, Terraform)</h4><span class="percent">78%</span></div>
+            <div class="bar"><div class="bar-fill" data-fill="78"></div></div>
+          </div>
+          <div class="skill">
+            <div class="skill-head"><h4 data-i18n="skill_cloud">Cloud Security (AWS/GCP)</h4><span class="percent">65%</span></div>
+            <div class="bar"><div class="bar-fill" data-fill="65"></div></div>
+          </div>
+          <div class="skill">
+            <div class="skill-head"><h4 data-i18n="skill_scripting">Scripting & Forensics</h4><span class="percent">72%</span></div>
+            <div class="bar"><div class="bar-fill" data-fill="72"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section projects">
+      <div class="container">
+        <h2 data-i18n="projects_title">Selected Projects</h2>
+        <p class="lead" data-i18n="projects_lead">Homelab deployments, CTF solutions and small security tooling — examples of hands-on practice and learning.</p>
+
+        <div class="projects-grid">
+          <!-- Project 1: enhanced preview but keep original elements -->
+          <article class="project-card">
+            <!-- NEW: small thumbnail / visual preview (optional image file) -->
+            <div class="card-media" style="background-image:url('assets/images/project-hardening.jpg')" aria-hidden="true"></div>
+
+            <div class="pc-header"><h3 data-i18n="proj1_title">Automated Hardening Script</h3><span class="tag">Bash · Ansible</span></div>
+            <p data-i18n="proj1_desc">Automated hardening playbook for homelab VMs with idempotent checks and monitoring hooks.</p>
+            <div class="pc-footer enhanced-footer">
+              <!-- keep original href attributes (app.js uses them) but add data-type attr for nicer labels -->
+              <a class="btn small ghost view-code" href="assets/projects/hardening.sh" data-name="Automated Hardening Script" data-lang="bash">View Code</a>
+              <a class="btn small ghost" href="assets/projects/hardening.sh" download="hardening.sh">Download</a>
+            </div>
+          </article>
+
+          <!-- Project 2 -->
+          <article class="project-card">
+            <div class="card-media" style="background-image:linear-gradient(135deg,#0f1724 0%, #0b1220 100%)" aria-hidden="true">
+              <div class="media-badge">Terraform · CI</div>
+            </div>
+
+            <div class="pc-header"><h3 data-i18n="proj2_title">Cloud Infra + Secure CI/CD</h3><span class="tag">Terraform · CI</span></div>
+            <p data-i18n="proj2_desc">Prototype of zero-trust VPCs and CI gates for a small web service (lab project).</p>
+            <div class="pc-footer enhanced-footer">
+              <a class="btn small ghost view-code" href="assets/projects/terraform_example.tf" data-name="Cloud Infra + Secure CI/CD" data-lang="terraform">View Code</a>
+              <a class="btn small ghost" href="assets/projects/terraform_example.tf" download="terraform_example.tf">Download</a>
+            </div>
+          </article>
+
+          <!-- Project 3 -->
+          <article class="project-card">
+            <div class="card-media" style="background-image:url('assets/images/project-dfir.jpg')" aria-hidden="true"></div>
+
+            <div class="pc-header"><h3 data-i18n="proj3_title">Incident Response Automation</h3><span class="tag">Python</span></div>
+            <p data-i18n="proj3_desc">Scripts to collect logs and triage alerts in the homelab for DFIR practice.</p>
+            <div class="pc-footer enhanced-footer">
+              <a class="btn small ghost view-code" href="assets/projects/collect_logs.py" data-name="Incident Response Automation" data-lang="python">View Code</a>
+              <a class="btn small ghost" href="assets/projects/collect_logs.py" download="collect_logs.py">Download</a>
+            </div>
+          </article>
+
+          <!-- keep other project entries unchanged (structure preserved) -->
+          <article class="project-card">
+            <div class="pc-header"><h3 data-i18n="proj4_title">DHCP + DNS Auto Setup</h3><span class="tag">Bash · BIND9 · DHCP</span></div>
+            <p data-i18n="proj4_desc">Automates Netplan, ISC DHCP and BIND9 configuration for a lab/edge server (interactive script; run as root on Ubuntu).</p>
+            <div class="pc-footer">
+              <a class="btn small ghost view-code" href="assets/projects/dhcp_dns_setup.sh" data-name="DHCP + DNS Auto Setup">View Code</a>
+              <a class="btn small ghost" href="assets/projects/dhcp_dns_setup.sh" download="dhcp_dns_setup.sh">Download</a>
+            </div>
+          </article>
+
+          <article class="project-card">
+            <div class="pc-header"><h3 data-i18n="proj5_title">Nextcloud Installer (PHP 8.2 + NGINX)</h3><span class="tag">Bash · NGINX · PHP</span></div>
+            <p data-i18n="proj5_desc">Automated installer for Nextcloud (PHP 8.2, NGINX, MariaDB, certbot). Interactive lab script — review before running in production.</p>
+            <div class="pc-footer">
+              <a class="btn small ghost view-code" href="assets/projects/nextcloud_installer.sh" data-name="Nextcloud Installer (PHP 8.2 + NGINX)">View Code</a>
+              <a class="btn small ghost" href="assets/projects/nextcloud_installer.sh" download="nextcloud_installer.sh">Download</a>
+            </div>
+          </article>
+
+        </div>
+
+        <p class="muted" style="margin-top:1rem">Nota: si abres la web con file:// algunos navegadores no permiten cargar los ficheros vía fetch; para usar el visor integrado, sirve la carpeta con un servidor local (ej. python -m http.server).</p>
+      </div>
+    </section>
+
+    <section id="certs" class="section certs">
+      <div class="container">
+        <h2 data-i18n="certs_title">Certifications & Labs</h2>
+
+        <div class="certs-layout">
+          <div class="certs-column">
+            <h3 data-i18n="certs_have_title">Certifications I have</h3>
+            <div class="cert-list">
+              <div class="cert">
+                <div class="cert-left">
+                  <div class="cert-badge">✓</div>
+                </div>
+                <div class="cert-body">
+                  <div class="cert-name" data-i18n="cert_have_1">Introduction to Cybersecurity — Cisco</div>
+                  <div class="cert-desc" data-i18n="cert_have_1_desc">Curso introductorio de fundamentos de ciberseguridad (Cisco).</div>
+                </div>
+              </div>
+
+              <div class="cert">
+                <div class="cert-left"><div class="cert-badge">✓</div></div>
+                <div class="cert-body">
+                  <div class="cert-name" data-i18n="cert_have_2">Network Technician Career Path — Cisco</div>
+                  <div class="cert-desc" data-i18n="cert_have_2_desc">Ruta formativa centrada en redes y administración básica (Cisco).</div>
+                </div>
+              </div>
+
+              <div class="cert">
+                <div class="cert-left"><div class="cert-badge">✓</div></div>
+                <div class="cert-body">
+                  <div class="cert-name" data-i18n="cert_have_3">Junior Cybersecurity Analyst Career — Cisco</div>
+                  <div class="cert-desc" data-i18n="cert_have_3_desc">Formación orientada a analista junior en ciberseguridad (Cisco).</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="certs-column">
+            <h3 data-i18n="certs_plan_title">In progress / Planned</h3>
+            <div class="cert-list">
+              <div class="cert">
+                <div class="cert-left"><div class="cert-badge planned">⏳</div></div>
+                <div class="cert-body">
+                  <div class="cert-name" data-i18n="cert_plan_1">LPIC-1: Linux Administrator</div>
+                  <div class="cert-desc" data-i18n="cert_plan_1_desc">Certificación de Linux Professional Institute — administración básica.</div>
+                </div>
+              </div>
+
+              <div class="cert">
+                <div class="cert-left"><div class="cert-badge planned">⏳</div></div>
+                <div class="cert-body">
+                  <div class="cert-name" data-i18n="cert_plan_2">Azure Fundamentals (AZ-900)</div>
+                  <div class="cert-desc" data-i18n="cert_plan_2_desc">Fundamentos de Microsoft Azure (AZ-900).</div>
+                </div>
+              </div>
+
+              <div class="cert">
+                <div class="cert-left"><div class="cert-badge planned">⏳</div></div>
+                <div class="cert-body">
+                  <div class="cert-name" data-i18n="cert_plan_3">Azure Administrator (AZ-104)</div>
+                  <div class="cert-desc" data-i18n="cert_plan_3_desc">Administración de Azure — AZ-104 (objetivo).</div>
+                </div>
+              </div>
+
+              <div class="cert">
+                <div class="cert-left"><div class="cert-badge planned">⏳</div></div>
+                <div class="cert-body">
+                  <div class="cert-name" data-i18n="cert_plan_4">Cisco Certified Network Associate (CCNA)</div>
+                  <div class="cert-desc" data-i18n="cert_plan_4_desc">CCNA — fundamentos de redes Cisco (objetivo).</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="contact" class="section contact">
+      <div class="container">
+        <h2 data-i18n="contact_title">Contact</h2>
+        <p class="lead" data-i18n="contact_lead">If you want a secure infra, incident response or automation—let’s talk.</p>
+
+        <div class="contact-grid">
+          <div class="contact-card">
+            <h3 data-i18n="contact_get_in">Get in touch</h3>
+            <p><strong>Email:</strong> <a href="mailto:monterosanchezadria@gmail.com">monterosanchezadria@gmail.com</a></p>
+            <p><strong>Location:</strong> Barcelona / Remote</p>
+
+            <!-- Redes sociales mejoradas -->
+            <div class="socials" aria-label="Socials">
+              <!-- GitHub -->
+              <a class="social-btn" href="#" target="_blank" rel="noopener" aria-label="GitHub — Adrià Montero">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.09 3.29 9.4 7.86 10.92.57.11.78-.25.78-.55 0-.27-.01-1-.01-1.95-3.2.7-3.88-1.38-3.88-1.38-.52-1.32-1.27-1.67-1.27-1.67-1.04-.71.08-.7.08-.7 1.14.08 1.74 1.18 1.74 1.18 1.02 1.75 2.68 1.25 3.33.95.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.72 0-1.26.45-2.29 1.18-3.1-.12-.29-.51-1.46.11-3.04 0 0 .97-.31 3.18 1.18a11.03 11.03 0 0 1 5.79 0c2.2-1.5 3.17-1.18 3.17-1.18.62 1.58.23 2.75.12 3.04.73.81 1.17 1.84 1.17 3.1 0 4.45-2.7 5.43-5.28 5.71.41.36.78 1.08.78 2.18 0 1.58-.01 2.85-.01 3.24 0 .31.2.67.79.55C20.71 21.4 24 17.09 24 12 24 5.65 18.35.5 12 .5z" fill="currentColor"/></svg>
+                <span class="social-label">GitHub</span>
+              </a>
+
+              <!-- LinkedIn -->
+              <a class="social-btn" href="#" target="_blank" rel="noopener" aria-label="LinkedIn — Adrià Montero">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M4.98 3.5C4.98 4.88 3.86 6 2.48 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v15H0V8zm7.5 0h4.78v2.04h.07c.66-1.24 2.28-2.54 4.69-2.54C23.2 7.5 24 9.44 24 13.06V23h-5v-8.12c0-1.93-.03-4.41-2.69-4.41-2.7 0-3.11 2.1-3.11 4.27V23h-5V8z" fill="currentColor"/></svg>
+                <span class="social-label">LinkedIn</span>
+              </a>
+
+              <!-- X (Twitter/X) -->
+              <a class="social-btn" href="#" target="_blank" rel="noopener" aria-label="X — Adrià Montero">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><path d="M22.46 6c-.77.35-1.6.58-2.46.69.89-.53 1.57-1.37 1.89-2.37-.84.5-1.77.86-2.76 1.06A4.15 4.15 0 0 0 15.5 4c-2.3 0-4.15 1.86-4.15 4.15 0 .33.04.65.11.96C7.69 9 4.07 7.13 1.64 4.15c-.36.62-.57 1.34-.57 2.1 0 1.44.73 2.71 1.86 3.45-.68-.02-1.33-.21-1.89-.52v.05c0 2.02 1.44 3.7 3.35 4.08-.35.1-.72.16-1.1.16-.27 0-.54-.03-.8-.08.54 1.68 2.12 2.9 3.99 2.93A8.34 8.34 0 0 1 0 19.54a11.75 11.75 0 0 0 6.29 1.84c7.55 0 11.68-6.26 11.68-11.69v-.53C21.1 7.67 21.86 6.87 22.46 6z" fill="currentColor"/></svg>
+                <span class="social-label">X</span>
+              </a>
+            </div>
+
+          </div>
+
+          <form class="contact-form" action="mailto:monterosanchezadria@gmail.com" method="post" enctype="text/plain" aria-label="Contact form">
+            <label for="name" data-i18n="form_name">Name</label>
+            <input id="name" name="Name" required>
+            <label for="email" data-i18n="form_email">Email</label>
+            <input id="email" name="Email" type="email" required>
+            <label for="message" data-i18n="form_message">Message</label>
+            <textarea id="message" name="Message" rows="5" required></textarea>
+            <div class="form-actions">
+              <button type="submit" class="btn filled" data-i18n="form_send">Send</button>
+              <button type="reset" class="btn ghost" data-i18n="form_reset">Reset</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; <span id="year"></span> <span data-i18n="footer_name">Adrià Montero</span> — <span data-i18n="footer_tag">Systems & Security</span></p>
+    </div>
+  </footer>
+
+  <!-- Code viewer modal (kept original structure; behavior improved in app.js) -->
+  <div id="codeModal" class="code-modal" aria-hidden="true" role="dialog" aria-modal="true">
+    <div class="code-modal-body" role="document">
+      <button id="codeModalClose" class="code-modal-close" aria-label="Close">✕</button>
+      <h3 id="codeModalTitle"></h3>
+      <pre id="codeModalContent"><code></code></pre>
+      <div class="code-modal-actions">
+        <a id="codeModalOpen" class="btn small ghost" target="_blank" rel="noopener">Open raw</a>
+        <a id="codeModalDownload" class="btn small ghost">Download</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/i18n.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

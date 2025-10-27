@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>CV — Adrià Montero</title>
+  <style>
+    body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;padding:2rem;color:#061226;background:#f7fbff;line-height:1.45}
+    header{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
+    h1{margin:0}
+    .meta{color:#333;border-left:4px solid #60a5fa;padding-left:.6rem;margin-top:.5rem}
+    section{margin-top:1.2rem}
+    .col{display:flex;gap:1.2rem;flex-wrap:wrap}
+    .card{background:#fff;padding:1rem;border-radius:8px;box-shadow:0 4px 14px rgba(2,6,23,0.06);flex:1;min-width:260px}
+    ul{margin:0;padding-left:1.1rem}
+    .muted{color:#475569}
+    footer{margin-top:2rem;color:#6b7280}
+    .skills-list{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.6rem}
+    .skill-pill{background:#eef6f8;padding:.3rem .6rem;border-radius:999px;font-size:.92rem;color:#0e2630}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Adrià Montero</h1>
+      <div class="meta">SysAdmin • Cybersecurity (junior)</div>
+    </div>
+    <div>
+      <p>Email: <a href="mailto:monterosanchezadria@gmail.com">monterosanchezadria@gmail.com</a></p>
+      <p>Location: Barcelona / Remote</p>
+    </div>
+  </header>
+
+  <section>
+    <h2>Summary</h2>
+    <p class="muted">
+      Junior Systems Administrator finishing the ASIX higher technical degree. I build practical skills through homelab projects, CTFs and guided labs focused on Linux administration, automation and incident response. I enjoy solving operational problems by automating repeatable tasks, documenting procedures and improving reliability.
+    </p>
+  </section>
+
+  <section class="col">
+    <div class="card">
+      <h3>Hands-on Projects & Labs</h3>
+      <ul>
+        <li><strong>Automated hardening / Ansible & Bash</strong> — Idempotent tasks to harden homelab VMs, set sysctl rules, enable basic monitoring and provide rollback-safe steps.</li>
+        <li><strong>DFIR tools / Python</strong> — Small collectors and triage scripts to gather logs and environment information for analysis.</li>
+        <li><strong>Network automation</strong> — Scripts and examples to provision Netplan, DHCP and DNS for lab networks.</li>
+        <li><strong>Nextcloud demo installer</strong> — Automated installer for PHP/Nginx/MariaDB stack used to practice infra automation and TLS with certbot.</li>
+        <li>Active participation in CTFs and platform labs (TryHackMe, HackTheBox) to practice offensive and defensive techniques.</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <h3>Skills</h3>
+      <div class="skills-list">
+        <span class="skill-pill">Linux (Debian/Ubuntu)</span>
+        <span class="skill-pill">Bash scripting</span>
+        <span class="skill-pill">Python (automation)</span>
+        <span class="skill-pill">Ansible & Terraform (basic)</span>
+        <span class="skill-pill">Docker & container basics</span>
+        <span class="skill-pill">Networking fundamentals</span>
+        <span class="skill-pill">DFIR basics & log collection</span>
+        <span class="skill-pill">Git & CI concepts</span>
+      </div>
+
+      <h3 style="margin-top:1rem">Learning & Certifications</h3>
+      <ul>
+        <li>Introduction to Cybersecurity — Cisco</li>
+        <li>Network Technician Career Path — Cisco</li>
+        <li>Junior Cybersecurity Analyst Career — Cisco</li>
+        <li>LPIC-1 (planned), Azure AZ-900 & AZ-104 (planned), CCNA (planned)</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2>Education</h2>
+    <p class="muted"><strong>ASIX (Administració de Sistemes Informàtics en Xarxa) — Higher technical degree</strong><br/>Relevant coursework: system administration, network services, security fundamentals, scripting and deployment automation. Final projects focused on homelab deployments and service hardening.</p>
+  </section>
+
+  <section>
+    <h2>Availability</h2>
+    <p class="muted">Open to junior SysAdmin / SecOps positions, internships and freelance projects. Available for remote roles and willing to relocate for the right position. Prefers environments where learning is encouraged and automation is respected.</p>
+  </section>
+
+  <footer>
+    <p>This résumé is a living document reflecting current status. Replace any placeholder details and expand with links to repositories or proofs of work before public sharing.</p>
+  </footer>
+</body>
+</html>
