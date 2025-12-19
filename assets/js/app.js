@@ -1,290 +1,582 @@
-// Main interactive behaviors: i18n, theme, particles, skill animation, small UX helpers,
-// plus an improved code viewer for project files that preserves original behavior.
-
-// ---------- i18n ----------
-const DEFAULT_LANG = 'es';
-const supportedLangs = ['ca','es','en'];
-
-function getSavedLang(){
-  try {
-    return localStorage.getItem('site_lang') || DEFAULT_LANG;
-  } catch(e){ return DEFAULT_LANG; }
-}
-
-function saveLang(lang){
-  try { localStorage.setItem('site_lang', lang); } catch(e){}
-}
-
-function setLang(lang){
-  if(!window.__TRANSLATIONS || !window.__TRANSLATIONS[lang]) lang = DEFAULT_LANG;
-  const tr = window.__TRANSLATIONS[lang];
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const key = el.getAttribute('data-i18n');
-    if(tr[key]) el.textContent = tr[key];
-  });
-  document.documentElement.lang = lang;
-  saveLang(lang);
-  // update active lang button
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active', b.dataset.lang===lang));
-}
-
-// bind language buttons and other behaviors
-document.addEventListener('DOMContentLoaded', ()=>{
-  // set year
-  const y = document.getElementById('year');
-  if(y) y.textContent = new Date().getFullYear();
-
-  // initialize i18n
-  const saved = getSavedLang();
-  setLang(saved);
-
-  document.querySelectorAll('.lang-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      setLang(btn.dataset.lang);
-    });
-  });
-
-  // theme init: preference -> saved -> system
-  const savedTheme = localStorage.getItem('site_theme');
-  const systemPref = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-  const initial = savedTheme || systemPref;
-  applyTheme(initial);
-
-  const themeToggle = document.getElementById('themeToggle');
-  themeToggle && themeToggle.addEventListener('click', ()=>{
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    applyTheme(next);
-  });
-
-  // skill bars animation on scroll
-  const skillsSection = document.querySelector('.skills');
-  if(skillsSection){
-    const observer = new IntersectionObserver(entries=>{
-      entries.forEach(entry=>{
-        if(entry.isIntersecting){
-          document.querySelectorAll('.bar-fill').forEach(el=>{
-            const target = el.dataset.fill || 80;
-            el.style.width = target + '%';
-          });
-          observer.disconnect();
-        }
-      });
-    },{threshold:0.2});
-    observer.observe(skillsSection);
-  }
-
-  // smooth scrolling for internal links
-  document.querySelectorAll('a[href^="#"]').forEach(a=>{
-    a.addEventListener('click', e=>{
-      e.preventDefault();
-      const id = a.getAttribute('href').slice(1);
-      const el = document.getElementById(id);
-      if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
-    });
-  });
-
-  // bind view-code buttons (project viewer) -- keep original behavior (uses href)
-  document.querySelectorAll('.view-code').forEach(btn=>{
-    btn.addEventListener('click', async (e)=>{
-      e.preventDefault();
-      const href = btn.getAttribute('href');
-      const name = btn.dataset.name || href;
-      const lang = btn.dataset.lang || '';
-      openCodeModal(href, name, lang);
-    });
-  });
-
-  // modal close
-  const modalClose = document.getElementById('codeModalClose');
-  modalClose && modalClose.addEventListener('click', closeCodeModal);
-  const modal = document.getElementById('codeModal');
-  modal && modal.addEventListener('click', (e)=>{
-    if(e.target === modal) closeCodeModal();
-  });
-
-  // close with Escape
-  document.addEventListener('keydown', (e)=>{
-    if(e.key === 'Escape' && document.getElementById('codeModal') && document.getElementById('codeModal').getAttribute('aria-hidden') === 'false'){
-      closeCodeModal();
-    }
-  });
-
-  // particles init
-  initParticles();
+document.addEventListener('DOMContentLoaded', () => {
+    // initTypewriter(); // Replaced by Interactive Terminal
+    initInteractiveTerminal();
+    initTheme();
+    initI18n();
+    initModal();
+    initParticles();
+    initScrollAnimations();
+    initSkillAnimation();
+    updateYear();
 });
 
-// ---------- Theme ----------
-function applyTheme(theme){
-  if(theme === 'light'){
-    document.documentElement.setAttribute('data-theme','light');
-    localStorage.setItem('site_theme','light');
-    const t = document.getElementById('themeToggle');
-    if(t){ t.textContent = '☀️'; t.setAttribute('aria-pressed','true'); }
-  } else {
-    document.documentElement.setAttribute('data-theme','dark');
-    localStorage.setItem('site_theme','dark');
-    const t = document.getElementById('themeToggle');
-    if(t){ t.textContent = '🌙'; t.setAttribute('aria-pressed','false'); }
-  }
-}
+// --- Interactive Terminal (Advanced) ---
+function initInteractiveTerminal() {
+    const input = document.getElementById('term-input');
+    const output = document.getElementById('term-output');
+    const container = document.getElementById('terminal-body');
+    if (!input || !output) return;
 
-// ---------- Improved code modal viewer (keeps original markup) ----------
-/*
-  Behavior:
-  - Attempts to fetch the file and display it inside the modal
-  - If highlight.js is available it tries to highlight the code (detecting language by extension or data-lang)
-  - If fetch fails (CORS or file://), fallback text is shown and user can open the raw file in a new tab
-*/
-async function openCodeModal(url, title, forcedLang){
-  const modal = document.getElementById('codeModal');
-  const modalTitle = document.getElementById('codeModalTitle');
-  const pre = document.getElementById('codeModalContent');
-  const codeEl = pre.querySelector('code');
-  const modalOpen = document.getElementById('codeModalOpen');
-  const modalDownload = document.getElementById('codeModalDownload');
-
-  modalTitle.textContent = title || url.split('/').pop();
-  codeEl.textContent = 'Loading…';
-  pre.className = ''; // reset classes
-
-  // set open & download links
-  modalOpen.setAttribute('href', url);
-  modalDownload.setAttribute('href', url);
-  modalDownload.setAttribute('download', url.split('/').pop());
-
-  modal.setAttribute('aria-hidden','false');
-  modal.style.display = 'flex';
-
-  // helper: detect language from extension
-  function detectLangFromExt(path){
-    const ext = path.split('?')[0].split('.').pop().toLowerCase();
-    const map = {
-      'py':'python','sh':'bash','bash':'bash','tf':'terraform','tfvars':'terraform',
-      'yml':'yaml','yaml':'yaml','js':'javascript','json':'json','ps1':'powershell',
-      'rb':'ruby','php':'php','txt':'plaintext','md':'markdown'
+    // --- State ---
+    const fileSystem = {
+        name: 'root',
+        type: 'dir',
+        children: {
+            'home': {
+                type: 'dir',
+                children: {
+                    'guest': {
+                        type: 'dir',
+                        children: {
+                            'projects': {
+                                type: 'dir',
+                                children: {
+                                    'portfolio': { type: 'file', content: 'This website source code.' },
+                                    'homelab': { type: 'file', content: 'Docker compose files for my lab.' }
+                                }
+                            },
+                            'scripts': {
+                                type: 'dir',
+                                children: {
+                                    'monitor.sh': { type: 'file', content: '#!/bin/bash\n# Server Health Monitor...' },
+                                    'audit.ps1': { type: 'file', content: '# PowerShell User Audit...' }
+                                }
+                            },
+                            'about.txt': { type: 'file', content: 'I am a SysAdmin student passionate about automation and security.' },
+                            'todo.md': { type: 'file', content: '- Finish degree\n- Learn Kubernetes\n- Sleep' }
+                        }
+                    }
+                }
+            }
+        }
     };
-    return map[ext] || ext;
-  }
 
-  try {
-    const resp = await fetch(url, {cache: "no-cache"});
-    if(!resp.ok) throw new Error('HTTP ' + resp.status);
-    const text = await resp.text();
+    let currentPath = ['home', 'guest'];
+    let commandHistory = [];
+    let historyIndex = -1;
 
-    // remove any old language class
-    pre.className = '';
-    codeEl.className = '';
-
-    // decide language
-    const lang = forcedLang || detectLangFromExt(url);
-    if(window.hljs && lang){
-      // highlight.js expects language class on <code> like "language-python" or just class "python"
-      codeEl.classList.add(lang);
+    // --- Helper: Get Current Dir Object ---
+    function getCurrentDir() {
+        let current = fileSystem.children;
+        for (const segment of currentPath) {
+            current = current[segment].children;
+        }
+        return current;
     }
 
-    codeEl.textContent = text;
+    // --- Helper: Resolve Path ---
+    function resolvePath(pathStr) {
+        if (pathStr === '/') return [];
+        if (pathStr === '~') return ['home', 'guest'];
 
-    // run highlight if available
-    if(window.hljs && typeof hljs.highlightElement === 'function'){
-      try { hljs.highlightElement(codeEl); } catch(e){ /* ignore */ }
-      // ensure styled container
-      pre.classList.add('hljs');
+        let parts = pathStr.split('/').filter(p => p);
+        let tempPath = pathStr.startsWith('/') ? [] : [...currentPath];
+
+        for (const part of parts) {
+            if (part === '.') continue;
+            if (part === '..') {
+                if (tempPath.length > 0) tempPath.pop();
+            } else {
+                // Verify existence
+                let check = fileSystem.children;
+                // Root check
+                if (tempPath.length === 0) {
+                    if (!check[part]) return null;
+                } else {
+                    for (const seg of tempPath) {
+                        check = check[seg].children;
+                    }
+                    if (!check[part] || check[part].type !== 'dir') return null;
+                }
+                tempPath.push(part);
+            }
+        }
+        return tempPath;
     }
 
-    // focus code for keyboard users
-    codeEl.setAttribute('tabindex', '0');
-    codeEl.focus();
-  } catch (err){
-    // graceful fallback: show message and leave "Open raw" / "Download" enabled
-    codeEl.textContent = 'No se pudo cargar el fichero dentro del modal (fetch falló o CORS/file://). Puedes abrirlo en una pestaña nueva con "Open raw".\n\nError: ' + (err.message || err);
-  }
+    function updatePrompt() {
+        const promptSpan = document.querySelector('.prompt');
+        let pathString = '~';
+        if (currentPath.join('/') !== 'home/guest') {
+            pathString = '/' + currentPath.join('/');
+        }
+        promptSpan.textContent = `guest@portfolio:${pathString}$`;
+    }
+
+    // --- Event Listeners ---
+    container.addEventListener('click', () => input.focus());
+
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const cmdLine = input.value.trim();
+            if (!cmdLine) return; // ignore empty
+
+            input.value = '';
+
+            // History
+            commandHistory.push(cmdLine);
+            historyIndex = commandHistory.length;
+
+            // Echo
+            let pathString = '~';
+            if (currentPath.join('/') !== 'home/guest') pathString = '/' + currentPath.join('/');
+
+            // Construct colored prompt HTML
+            const promptHtml = `<span class="prompt">guest@portfolio:${pathString}$</span> <span class="text-muted">${cmdLine}</span>`;
+            printLine(promptHtml);
+
+            // Parse
+            const args = cmdLine.split(/\s+/);
+            const cmd = args[0].toLowerCase();
+            const param = args[1]; // simplified support for 1 arg usually
+
+            // Execute
+            executeCommand(cmd, args.slice(1));
+
+            // Scroll
+            container.scrollTop = container.scrollHeight;
+        }
+        else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (historyIndex > 0) {
+                historyIndex--;
+                input.value = commandHistory[historyIndex];
+            }
+        }
+        else if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (historyIndex < commandHistory.length - 1) {
+                historyIndex++;
+                input.value = commandHistory[historyIndex];
+            } else {
+                historyIndex = commandHistory.length;
+                input.value = '';
+            }
+        }
+        else if (e.key === 'Tab') {
+            e.preventDefault();
+            const currentVal = input.value;
+            const args = currentVal.split(' ');
+            const lastArg = args[args.length - 1]; // what we are typing
+
+            // Get current files
+            const files = Object.keys(getCurrentDir());
+
+            // Filter matches
+            const matches = files.filter(f => f.startsWith(lastArg));
+
+            if (matches.length === 1) {
+                // Complete it
+                args[args.length - 1] = matches[0];
+                // if it's a dir, maybe add / ? logic for another day, just simple complete
+                if (getCurrentDir()[matches[0]].type === 'dir') args[args.length - 1] += '/';
+                input.value = args.join(' ');
+            } else if (matches.length > 1) {
+                // Show options? (optional but cool)
+                // For simplicity, do nothing or cycle? 
+                // Let's just do nothing if ambiguous for now to keep it simple, or best common prefix
+            }
+        }
+    });
+
+    function executeCommand(cmd, args) {
+        const dir = getCurrentDir();
+
+        switch (cmd) {
+            case 'help':
+                printLine('Available: ls, cd, cat, touch, mkdir, rm, neofetch, sudo, history, whoami, clear, matrix, pwd');
+                break;
+            case 'ls':
+                // List content
+                const items = Object.keys(dir).map(key => {
+                    const isDir = dir[key].type === 'dir';
+                    return `<span class="${isDir ? 'cmd' : ''}">${key}${isDir ? '/' : ''}</span>`;
+                });
+                printLine(items.join('  ') || '(empty directory)');
+                break;
+            case 'pwd':
+                printLine('/' + currentPath.join('/'));
+                break;
+            case 'cd':
+                let target = args[0];
+                if (!target || target === '~') {
+                    currentPath = ['home', 'guest'];
+                } else if (target === '..') {
+                    if (currentPath.length > 0) currentPath.pop();
+                } else {
+                    if (target.endsWith('/') && target.length > 1) target = target.slice(0, -1);
+                    if (dir[target]) {
+                        if (dir[target].type === 'dir') {
+                            currentPath.push(target);
+                        } else {
+                            printLine(`cd: ${target}: Not a directory`, 'red');
+                        }
+                    } else {
+                        printLine(`cd: ${target}: No such file or directory`, 'red');
+                    }
+                }
+                updatePrompt();
+                break;
+            case 'cat':
+                const file = args[0];
+                if (!file) { printLine('Usage: cat [filename]'); break; }
+                if (dir[file]) {
+                    if (dir[file].type === 'file') printLine(dir[file].content, 'text-muted');
+                    else printLine(`cat: ${file}: Is a directory`, 'red');
+                } else {
+                    printLine(`cat: ${file}: No such file`, 'red');
+                }
+                break;
+            case 'touch':
+                const newFile = args[0];
+                if (!newFile) break;
+                if (dir[newFile]) printLine(`touch: ${newFile}: already exists`);
+                else {
+                    dir[newFile] = { type: 'file', content: '' };
+                }
+                break;
+            case 'mkdir':
+                const newDir = args[0];
+                if (!newDir) break;
+                if (dir[newDir]) printLine(`mkdir: ${newDir}: already exists`, 'red');
+                else {
+                    dir[newDir] = { type: 'dir', children: {} };
+                }
+                break;
+            case 'rm':
+                const targetRm = args[0];
+                if (!targetRm) { printLine('Usage: rm [file]'); break; }
+                if (dir[targetRm]) {
+                    delete dir[targetRm];
+                    printLine(`Removed ${targetRm}`, 'text-muted');
+                } else {
+                    printLine(`rm: cannot remove '${targetRm}': No such file`, 'red');
+                }
+                break;
+            case 'sudo':
+                if (args.length === 0) {
+                    printLine('usage: sudo [command]');
+                } else {
+                    printLine('guest is not in the sudoers file. This incident will be reported.', 'red');
+                }
+                break;
+            case 'history':
+                commandHistory.forEach((cmd, i) => {
+                    printLine(` ${i + 1}  ${cmd}`, 'text-muted');
+                });
+                break;
+            case 'neofetch':
+                const asciiArt = `
+<span class="cmd">       _      </span>   guest@portfolio
+<span class="cmd">      / \\     </span>   ---------------
+<span class="cmd">     /   \\    </span>   <span class="text-muted">OS</span>: Portfolio OS (Web)
+<span class="cmd">    /  |  \\   </span>   <span class="text-muted">Kernel</span>: 5.15.0-js-generic
+<span class="cmd">   /   |   \\  </span>   <span class="text-muted">Uptime</span>: Forever
+<span class="cmd">  /    |    \\ </span>   <span class="text-muted">Shell</span>: ZSH (Simulated)
+<span class="cmd"> /_____|_____\\</span>   <span class="text-muted">Theme</span>: Cyber/Dark
+<span class="cmd">      | |     </span>   <span class="text-muted">CPU</span>: Brain 1.0 (Student Edition)
+<span class="cmd">      |_|     </span>   <span class="text-muted">Memory</span>: 99% Used (Learning)
+`;
+                // Use <pre> to allow formatting
+                printLine(`<div style="white-space: pre; line-height: 1.2;">${asciiArt}</div>`);
+                break;
+            case 'ip':
+                const isColor = args.includes('-c') || args.includes('-color');
+                // Filter out flags to check the subcommand
+                const subCmds = args.filter(a => !a.startsWith('-'));
+                const subCmd = subCmds[0] || 'addr'; // default to addr if no subcmd
+
+                if (['a', 'addr', 'address'].includes(subCmd)) {
+                    // Colors (simulating ip -c)
+                    const c = (text, cls) => `<span class="${cls}">${text}</span>`;
+                    const iface = (name) => c(name, 'cmd'); // command color (green/cyan)
+                    const ip = (addr) => c(addr, 'accent'); // pink/magenta or distinct
+                    const state = (s) => c(s, 'green');
+                    const muted = (t) => c(t, 'text-muted');
+
+                    // 1: lo
+                    printLine(`1: ${iface('lo')}: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000`);
+                    printLine(`    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00`);
+                    printLine(`    inet ${ip('127.0.0.1/8')} scope host lo`);
+                    printLine(`       valid_lft forever preferred_lft forever`);
+
+                    // 2: eth0
+                    printLine(`2: ${iface('eth0')}: <BROADCAST,MULTICAST,${state('UP')},${state('LOWER_UP')}> mtu 1500 qdisc fq_codel state ${state('UP')} group default qlen 1000`);
+                    printLine(`    link/ether 00:15:5d:01:ca:02 brd ff:ff:ff:ff:ff:ff`);
+                    printLine(`    inet ${ip('192.168.1.33/24')} brd 192.168.1.255 scope global dynamic eth0`);
+                    printLine(`       valid_lft 86326sec preferred_lft 86326sec`);
+                    printLine(`    inet6 ${ip('fe80::215:5dff:fe01:ca02/64')} scope link`);
+                    printLine(`       valid_lft forever preferred_lft forever`);
+
+                } else if (['r', 'route'].includes(subCmd)) {
+                    printLine(`default via 192.168.1.1 dev eth0 proto dhcpsrc 192.168.1.33 metric 100`);
+                    printLine(`192.168.1.0/24 dev eth0 proto kernel scope link src 192.168.1.33`);
+                } else {
+                    printLine(`ip: object "${subCmd}" is unknown`, 'red');
+                }
+                break;
+            case 'whoami':
+                printLine('guest (uid=1000)', 'green');
+                break;
+            case 'clear':
+                output.innerHTML = '';
+                break;
+            case 'matrix':
+                printLine('Wake up, Neo...', 'green');
+                initMatrixRain();
+                break;
+
+            default:
+                printLine(`Command not found: ${cmd}`, 'red');
+        }
+    }
+
+    function printLine(html, className = '') {
+        const div = document.createElement('div');
+        if (className) div.className = className;
+        div.innerHTML = html; // InnerHTML to support spans in ls
+        output.appendChild(div);
+    }
+
+    // Initial update
+    updatePrompt();
 }
 
-function closeCodeModal(){
-  const modal = document.getElementById('codeModal');
-  if(modal){
-    modal.setAttribute('aria-hidden','true');
-    modal.style.display = 'none';
-    const pre = document.getElementById('codeModalContent');
-    const codeEl = pre && pre.querySelector('code');
-    if(codeEl) codeEl.textContent = '';
-    const modalTitle = document.getElementById('codeModalTitle');
-    if(modalTitle) modalTitle.textContent = '';
-  }
+// Deprecated: old processCommand is integrated into initInteractiveTerminal
+function processCommand() { }
+function printLine() { } // scoped inside now
+
+
+// --- Matrix Rain Easter Egg ---
+function initMatrixRain() {
+    const canvas = document.getElementById('hero-canvas');
+    if (!canvas) return;
+
+    // Enable Matrix Mode
+    canvas.classList.add('matrix-mode');
+    const ctx = canvas.getContext('2d');
+
+    // config
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+    const cols = Math.floor(width / 20);
+    const ypos = Array(cols).fill(0);
+
+    ctx.fillStyle = '#000';
+    ctx.fillRect(0, 0, width, height);
+
+    function matrix() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.fillStyle = '#0f0';
+        ctx.font = '15pt monospace';
+
+        ypos.forEach((y, ind) => {
+            const text = String.fromCharCode(Math.random() * 128);
+            const x = ind * 20;
+            ctx.fillText(text, x, y);
+
+            if (y > height && Math.random() > 0.975) ypos[ind] = 0;
+            else ypos[ind] = y + 20;
+        });
+
+        if (canvas.classList.contains('matrix-mode')) {
+            requestAnimationFrame(matrix);
+        }
+    }
+
+    // Stop previous particle animation loop logic implicitly by overwriting drawing...
+    // In a robust app we'd have a cancelAnimationFrame ID, but here the 'matrix' class 
+    // can act as a flag or we just let it take over the context.
+    // For simplicity, we just start the loop.
+    matrix();
 }
 
-// ---------- Particles (simple, lightweight) ----------
-function initParticles(){
-  const canvas = document.getElementById('particles');
-  if(!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let w = canvas.width = canvas.clientWidth;
-  let h = canvas.height = canvas.clientHeight;
-  let particles = [];
-  const count = Math.max(30, Math.floor(w*h/50000));
+// --- Background Particles (Standard Node Network) ---
+let particleAnimId; // to cancel if needed
+function initParticles() {
+    const canvas = document.getElementById('hero-canvas');
+    if (!canvas || canvas.classList.contains('matrix-mode')) return;
 
-  function rand(min,max){ return Math.random()*(max-min)+min }
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+    const particleCount = 60;
+    const connectionDist = 140;
 
-  function create(){
-    particles = [];
-    for(let i=0;i<count;i++){
-      particles.push({
-        x: rand(0,w),
-        y: rand(0,h),
-        vx: rand(-0.3,0.3),
-        vy: rand(-0.2,0.2),
-        r: rand(0.6,2.2),
-        hue: rand(160,220),
-        alpha: rand(0.05,0.25)
-      });
+    function resize() {
+        if (!canvas.parentElement) return;
+        width = canvas.width = canvas.parentElement.clientWidth;
+        height = canvas.height = canvas.parentElement.clientHeight;
     }
-  }
 
-  function resize(){
-    w = canvas.width = canvas.clientWidth;
-    h = canvas.height = canvas.clientHeight;
-    create();
-  }
-  window.addEventListener('resize', debounce(resize, 200));
-  create();
-
-  function draw(){
-    ctx.clearRect(0,0,w,h);
-    // subtle gradient
-    const g = ctx.createLinearGradient(0,0,w,h);
-    // dynamic depending on theme for subtle effect
-    const isLight = document.documentElement.getAttribute('data-theme') === 'light';
-    if(isLight){
-      g.addColorStop(0,'rgba(242,246,250,0.9)');
-      g.addColorStop(1,'rgba(238,245,251,0.9)');
-    } else {
-      g.addColorStop(0,'rgba(6,10,20,0.7)');
-      g.addColorStop(1,'rgba(6,12,24,0.6)');
+    class Particle {
+        constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height;
+            this.vx = (Math.random() - 0.5) * 0.4;
+            this.vy = (Math.random() - 0.5) * 0.4;
+            this.size = Math.random() * 2 + 1;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0 || this.x > width) this.vx *= -1;
+            if (this.y < 0 || this.y > height) this.vy *= -1;
+        }
+        draw() {
+            ctx.beginPath();
+            ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--primary').trim() || '#6ee7b7';
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
     }
-    ctx.fillStyle = g;
-    ctx.fillRect(0,0,w,h);
 
-    for(let p of particles){
-      p.x += p.vx;
-      p.y += p.vy;
-      if(p.x < -10) p.x = w+10;
-      if(p.x > w+10) p.x = -10;
-      if(p.y < -10) p.y = h+10;
-      if(p.y > h+10) p.y = -10;
-
-      ctx.beginPath();
-      ctx.fillStyle = `hsla(${p.hue},80%,65%,${p.alpha})`;
-      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fill();
+    function init() {
+        particles = [];
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
     }
-    requestAnimationFrame(draw);
-  }
-  draw();
+
+    function animate() {
+        if (canvas.classList.contains('matrix-mode')) return; // Stop if matrix is active
+
+        ctx.clearRect(0, 0, width, height);
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+            for (let j = i; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < connectionDist) {
+                    ctx.beginPath();
+                    const alpha = 1 - (dist / connectionDist);
+                    ctx.strokeStyle = `rgba(148, 163, 184, ${alpha * 0.2})`;
+                    ctx.lineWidth = 1;
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        particleAnimId = requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', () => { resize(); init(); });
+    resize();
+    init();
+    animate();
 }
 
-// ---------- utilities ----------
-function debounce(fn, wait){
-  let t;
-  return (...a)=>{ clearTimeout(t); t = setTimeout(()=>fn(...a), wait); };
+// --- Scroll Reveal Animation ---
+function initScrollAnimations() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal, .reveal-delayed, .glass-card, .section-title, .net-node').forEach(el => {
+        el.classList.add('reveal');
+        observer.observe(el);
+    });
+}
+
+// --- Skills Animation ---
+function initSkillAnimation() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const bar = entry.target.querySelector('.progress-bar');
+                if (bar) {
+                    const target = bar.style.width;
+                    bar.style.width = '0';
+                    setTimeout(() => bar.style.width = target, 100);
+                }
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.2 });
+
+    document.querySelectorAll('.skill-item').forEach(el => observer.observe(el));
+}
+
+// --- Theme Toggle ---
+function initTheme() {
+    const btn = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    const saved = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', saved);
+
+    btn.addEventListener('click', () => {
+        const current = html.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        btn.textContent = next === 'dark' ? '☀' : '☾';
+    });
+}
+
+// --- Modal Logic ---
+function initModal() {
+    const modal = document.getElementById('codeModal');
+    const closeBtn = document.getElementById('closeModal');
+    const codeContainer = document.getElementById('modalCode');
+    const title = document.getElementById('modalTitle');
+
+    if (!modal) return;
+    document.querySelectorAll('.view-code').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const file = btn.getAttribute('data-file');
+            const lang = btn.getAttribute('data-lang') || 'plaintext';
+            title.textContent = file.split('/').pop();
+            codeContainer.textContent = 'Fetching payload...';
+            codeContainer.className = `language-${lang}`;
+            modal.classList.add('open');
+            try {
+                const res = await fetch(file);
+                if (!res.ok) throw new Error('Access Denied');
+                const text = await res.text();
+                codeContainer.textContent = text;
+                hljs.highlightElement(codeContainer);
+            } catch (err) {
+                codeContainer.textContent = `Error: ${err.message}`;
+            }
+        });
+    });
+    const close = () => modal.classList.remove('open');
+    closeBtn.addEventListener('click', close);
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+}
+
+// --- I18n ---
+function initI18n() {
+    if (!window.TRANSLATIONS) return;
+    const validLangs = ['es', 'en'];
+    let currentLang = 'es';
+    const btns = document.querySelectorAll('.lang-switch button');
+    const setLang = (lang) => {
+        if (!validLangs.includes(lang)) return;
+        currentLang = lang;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (window.TRANSLATIONS[lang][key]) el.textContent = window.TRANSLATIONS[lang][key];
+        });
+        btns.forEach(b => {
+            b.classList.toggle('active', b.getAttribute('data-lang') === lang);
+        });
+    };
+    btns.forEach(btn => btn.addEventListener('click', () => setLang(btn.getAttribute('data-lang'))));
+}
+
+function updateYear() {
+    const el = document.getElementById('year');
+    if (el) el.textContent = new Date().getFullYear();
 }
