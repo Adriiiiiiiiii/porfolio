@@ -186,90 +186,9 @@
       </div>
     </section>
 
-    <!-- Homelab Topology Section -->
-    <section id="homelab" class="container" style="padding: 4rem 1rem;">
-      <h2 class="section-title">Homelab Architecture</h2>
-      <p class="text-muted" style="margin-bottom:2rem">
-        My playground. A segregated network for testing malware, deployed services, and simulations.
-      </p>
 
-      <!-- CSS Network Diagram -->
-      <div class="network-diagram reveal-delayed">
-        <div class="net-level level-1">
-          <div class="net-node router">
-            <span class="icon">🌐</span>
-            <span class="label">ISP / WAN</span>
-          </div>
-        </div>
-        <div class="net-line-vert"></div>
-        <div class="net-level level-2">
-          <div class="net-node firewall">
-            <span class="icon">🛡️</span>
-            <span class="label">PfSense (Firewall)</span>
-            <small>VLAN Routing / IDS</small>
-          </div>
-        </div>
-        <div class="net-line-vert"></div>
-        <div class="net-level level-3">
-          <div class="net-node switch">
-            <span class="icon">🔌</span>
-            <span class="label">Managed Switch</span>
-          </div>
-        </div>
 
-        <div class="net-branches">
-          <!-- Branch 1: Proxmox -->
-          <div class="net-branch">
-            <div class="net-line-corner-left"></div>
-            <div class="net-node server">
-              <span class="icon">🏢</span>
-              <span class="label">Proxmox Cluster</span>
-              <small>
-                - Docker Swarm (Webs)<br>
-                - Windows AD DC<br>
-                - Kali / Security Onion
-              </small>
-            </div>
-          </div>
 
-          <!-- Branch 2: NAS -->
-          <div class="net-branch">
-            <div class="net-line-corner-right"></div>
-            <div class="net-node storage">
-              <span class="icon">💾</span>
-              <span class="label">TrueNAS</span>
-              <small>ZFS Pool (Backup/Media)</small>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- CTF & Writeups Section -->
-    <section id="writeups" class="container" style="padding: 4rem 1rem;">
-      <h2 class="section-title">CTF & Writeups</h2>
-      <div class="glass-card reveal">
-        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
-          <div>
-            <h3 style="margin:0;">HackTheBox & TryHackMe</h3>
-            <p class="text-muted">Rank: <strong>Script Kiddie (Grinding...)</strong></p>
-          </div>
-          <div class="badges" style="display:flex; gap:0.5rem;">
-            <span class="tag htb">HTB: Forest (Hard)</span>
-            <span class="tag htb">HTB: Legacy</span>
-            <span class="tag thm">THM: Offensive Pentesting</span>
-          </div>
-        </div>
-        <p style="margin-top:1rem;">
-          I don't just solve boxes; I document the process. Check out my notes on privilege escalation and active
-          directory attacks.
-        </p>
-        <div class="mt-4">
-          <!-- Placeholder for actual writeup links -->
-          <button class="btn small ghost" disabled>View Notes (Coming Soon)</button>
-        </div>
-      </div>
-    </section>
 
     <!-- Projects Section -->
     <section id="projects" class="container" style="padding: 4rem 1rem;">
@@ -420,13 +339,7 @@
             <small class="text-muted">Completed</small>
           </div>
         </div>
-        <div class="cert-item glass-card" style="opacity: 0.7;">
-          <div class="check-icon" style="color:var(--text-muted)">⏳</div>
-          <div>
-            <div data-i18n="cert_plan_1">LPIC-1 Linux Admin</div>
-            <small class="text-muted">In Progress</small>
-          </div>
-        </div>
+
       </div>
     </section>
 
