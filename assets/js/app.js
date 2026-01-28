@@ -567,13 +567,25 @@ function initI18n() {
         currentLang = lang;
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
-            if (window.TRANSLATIONS[lang][key]) el.textContent = window.TRANSLATIONS[lang][key];
+            const translation = window.TRANSLATIONS[lang][key];
+            if (translation) {
+                if (el.tagName === 'META') {
+                    el.setAttribute('content', translation);
+                } else if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                    el.setAttribute('placeholder', translation);
+                } else {
+                    el.textContent = translation;
+                }
+            }
         });
         btns.forEach(b => {
             b.classList.toggle('active', b.getAttribute('data-lang') === lang);
         });
     };
     btns.forEach(btn => btn.addEventListener('click', () => setLang(btn.getAttribute('data-lang'))));
+
+    // Initialize in Spanish
+    setLang('es');
 }
 
 function updateYear() {

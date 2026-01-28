@@ -94,7 +94,8 @@
             </div>
             <div class="terminal-body" id="terminal-body" onclick="document.getElementById('term-input').focus()">
               <div id="term-output">
-                <div class="cmd-line">Type 'help' to see available commands. Try 'matrix' for a surprise.</div>
+                <div class="cmd-line" data-i18n="term_welcome">Type 'help' to see available commands. Try 'matrix' for a
+                  surprise.</div>
               </div>
               <div class="input-line">
                 <span class="prompt">guest@portfolio:~$</span>
@@ -378,9 +379,12 @@
         </div>
 
         <form action="mailto:monterosanchezadria@gmail.com" method="post" enctype="text/plain">
-          <input type="text" name="name" placeholder="Name" required aria-label="Name">
-          <input type="email" name="email" placeholder="Email" required aria-label="Email">
-          <textarea name="message" rows="5" placeholder="echo 'Hello World'" required aria-label="Message"></textarea>
+          <input type="text" name="name" placeholder="Name" required aria-label="Name"
+            data-i18n="form_name_placeholder">
+          <input type="email" name="email" placeholder="Email" required aria-label="Email"
+            data-i18n="form_email_placeholder">
+          <textarea name="message" rows="5" placeholder="echo 'Hello World'" required aria-label="Message"
+            data-i18n="form_message_placeholder"></textarea>
           <button type="submit" class="btn filled" data-i18n="form_send">Execute Send</button>
         </form>
       </div>
@@ -389,7 +393,7 @@
 
   <footer>
     <div class="container">
-      <p>&copy; <span id="year">2025</span> Adrià Montero. All systems normal.</p>
+      <p>&copy; <span id="year">2025</span> Adrià Montero. <span data-i18n="footer_text">All systems normal.</span></p>
     </div>
   </footer>
 

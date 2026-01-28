@@ -47,7 +47,13 @@ const TRANSLATIONS = {
 
     contact_title: "Let's Connect",
     contact_lead: "Eager to learn and work. Looking for internships or junior positions in SysAdmin/DevOps.",
-    form_send: "Execute Send"
+    form_send: "Execute Send",
+    form_name_placeholder: "Name",
+    form_email_placeholder: "Email",
+    form_message_placeholder: "echo 'Hello World'",
+    footer_text: "All systems normal.",
+    term_welcome: "Type 'help' to see available commands. Try 'matrix' for a surprise.",
+    meta_description: "Portfolio of Adrià Montero - SysAdmin Student & Cyber Enthusiast. Projects, scripts, and skills.",
   },
   es: {
     page_title: "Adrià Montero — Estudiante & SysAdmin",
@@ -97,7 +103,13 @@ const TRANSLATIONS = {
 
     contact_title: "Conectemos",
     contact_lead: "Con muchas ganas de aprender y trabajar. Busco prácticas o posición Junior en SysAdmin/DevOps.",
-    form_send: "Enviar Mensaje"
+    form_send: "Enviar Mensaje",
+    form_name_placeholder: "Nombre",
+    form_email_placeholder: "Correo",
+    form_message_placeholder: "echo 'Hola Mundo'",
+    footer_text: "Todos los sistemas operativos.",
+    term_welcome: "Escribe 'help' para ver comandos. Prueba 'matrix' para una sorpresa.",
+    meta_description: "Portfolio de Adrià Montero - Estudiante de SysAdmin y Ciberseguridad. Proyectos, scripts y conocimientos.",
   }
 };
 
